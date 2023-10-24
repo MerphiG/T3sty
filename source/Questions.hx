@@ -37,7 +37,12 @@ import file.save.FileSave;
 import sys.FileSystem;
 import sys.io.File;
 #end
-
+#if android
+import openfl.events.KeyboardEvent;
+import flash.events.TextEvent;
+import openfl.display.Stage;
+import flash.ui.Keyboard;
+#end
 class Questions extends FlxState
 {
 	private var camGame:FlxCamera;
@@ -86,25 +91,25 @@ class Questions extends FlxState
 	var CompletionBarPercent:Float;
 	var CompletionBar:FlxBar;
 	var CompletionText:FlxText;
-	
+
 	override function create() {
 		camGame = new FlxCamera();
 		FlxG.cameras.reset(camGame);
 		FlxCamera.defaultCameras = [camGame];
 		super.create();
-		
-		CompletionBarPercent = (CurQuestion / AmountOfQuestions); 
+
+		CompletionBarPercent = (CurQuestion / AmountOfQuestions);
 		CompletionBar = new FlxBar(0, 710, LEFT_TO_RIGHT, 1280, 720, this, 'CompletionBarPercent', 0, 1);
 		CompletionBar.createFilledBar(0xFF000000, 0xFFFFFFFF);
 		add(CompletionBar);
-		
+
 		CompletionText = new FlxText(0, 670, FlxG.width, "");
 		CompletionText.setFormat(Paths.font("DejaVuSerifCondensed.ttf"), 25, 0xFFFFFFFF, LEFT);
 		add(CompletionText);
-		
+
 		CompletionBar.visible = false;
 		CompletionText.visible = false;
-		
+
 		if (!ending) {
 			if (TestWasStarted) {
 				if (!EndOfTest) {
@@ -131,29 +136,32 @@ class Questions extends FlxState
 				var FIO:FlxText = new FlxText(0, 0, FlxG.width, 'Введите ФИО');
 				FIO.setFormat(Paths.font("DejaVuSerifCondensed.ttf"), 40, 0xFFFFFFFF, CENTER);
 				add(FIO);
-					
+
 				TextInput = new FlxText(0, 100, FlxG.width, AnswerText);
 				TextInput.setFormat(Paths.font("DejaVuSerifCondensed.ttf"), 40, 0xFFFFFFFF, CENTER);
 				add(TextInput);
-		
+
+				var box:FlxText = new FlxSprite(0,100).makeGraphic(FlxG.width, 100, 0xFF444444);
+				add(box);
+
 				LoadResults = new FlxText(0, 300, 170, 'Загрузить\nрезультаты');
 				LoadResults.setFormat(Paths.font("DejaVuSerifCondensed.ttf"), 30, 0xFF767676, CENTER);
 				LoadResults.screenCenter(X);
 				LoadResults.x += 100;
 				add(LoadResults);
-				
+
 				StartTest = new FlxText(0, 300, 120, 'Начать\nтест');
 				StartTest.setFormat(Paths.font("DejaVuSerifCondensed.ttf"), 30, 0xFF767676, CENTER);
 				StartTest.screenCenter(X);
 				StartTest.x -= 100;
 				add(StartTest);
-				
+
 				tint = new FlxText(0, 400, FlxG.width, '');
 				tint.setFormat(Paths.font("DejaVuSerifCondensed.ttf"), 20, 0xFFFFFFFF, CENTER);
 				tint.screenCenter(X);
 				tint.alpha = 0;
 				add(tint);
-				
+
 				var t3sty:FlxSprite = new FlxSprite(0,0).loadGraphic('assets/t3sty.png');
 				t3sty.scale.x = 0.2;
 				t3sty.scale.y = 0.2;
@@ -161,7 +169,7 @@ class Questions extends FlxState
 				t3sty.y += 290;
 				t3sty.antialiasing = true;
 				add(t3sty);
-	
+
 				var funnytext:FlxText = new FlxText(10, 660, FlxG.width, 'T3sty: v1.0\nCoded By: Merphi :P');
 				funnytext.setFormat(Paths.font("DejaVuSerifCondensed.ttf"), 20, 0xFFFFFFFF, LEFT);
 				add(funnytext);
@@ -218,6 +226,12 @@ class Questions extends FlxState
 	{
 		CompletionBarPercent = (CurQuestion / AmountOfQuestions); 
 		CompletionText.text = CurQuestion + '/' + AmountOfQuestions + '[' + Std.int(CompletionBarPercent*100) + '%' + ']';
+		#if android
+		if (FlxG.mouse.overlaps(TextInput) && FlxG.mouse.justPressed) {
+			FlxG.stage.window.textInputEnabled = true;
+			lock = !lock;
+		}
+		#end
 		if (!lock) {
 			if (!EndOfTest) {
 				if (TestWasStarted) {
@@ -600,6 +614,7 @@ class Questions extends FlxState
 	}
 	function InputText() {
 		if (AnswerText.length <= 40) {
+			#if sys
 			if (FlxG.keys.justPressed.Q) AnswerText = AnswerText + 'Й';
 			if (FlxG.keys.justPressed.W) AnswerText = AnswerText + 'Ц';
 			if (FlxG.keys.justPressed.E) AnswerText = AnswerText + 'У';
@@ -643,6 +658,9 @@ class Questions extends FlxState
 			if (FlxG.keys.pressed.SHIFT && FlxG.keys.justPressed.PERIOD) AnswerText = AnswerText + '.';
 			if (FlxG.keys.justPressed.SPACE) AnswerText = AnswerText + ' ';
 			//if (FlxG.keys.justPressed.ENTER) AnswerText = AnswerText + '\n';
+			#else
+			AnswerText.addEventListener(TextEvent.TEXT_INPUT, onTextInput);
+			#end
 		}
 	}
 	function QuestionCreate(Type:String, Question:String, AllAnsw:Array<String>, CorrectAnswString:Array<String>, ?CorrectAnswInt:Array<Int> = null)

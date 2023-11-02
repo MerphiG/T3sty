@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
-	<app title="T3sty" file="T3sty" packageName="com.merphi.fuckingtestprogram" package="com.merphi.fuckingtestprogram" main="Main" version="1.0" company="Merphi" />
+	<app title="T3sty" file="T3sty" packageName="com.merphi.fuckingtestprogram" package="com.merphi.fuckingtestprogram" main="Main" version="1.1" company="Merphi" />
 	
 	<haxedef name="LINC_LUA_RELATIVE_DYNAMIC_LIB"/>
 	
